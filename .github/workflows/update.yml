@@ -5,6 +5,9 @@ on:
     - cron: '0 */6 * * *'  # Every 6 hours
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   update:
     runs-on: ubuntu-latest
@@ -20,30 +23,36 @@ jobs:
           LATEST_REV=$(git ls-remote --tags https://github.com/PancakeTAS/lsfg-vk.git 'refs/tags/v2.0.0-dev' | awk '{print $1}')
           echo "rev=$LATEST_REV" >> $GITHUB_OUTPUT
 
+      - name: Get current commit
+        id: current
+        run: |
           CURRENT_REV=$(grep -oP "rev = \"[^\"]+\"" package.nix | sed 's/rev = "//;s/"//')
-          echo "current=$CURRENT_REV" >> $GITHUB_OUTPUT
+          echo "rev=$CURRENT_REV" >> $GITHUB_OUTPUT
 
       - name: Check if update needed
         id: check
         run: |
-          if [ "${{ steps.upstream.outputs.rev }}" = "v2.0.0-dev" ]; then
-            # Tag-based, need to resolve to commit
-            RESOLVED=$(git ls-remote https://github.com/PancakeTAS/lsfg-vk.git 'refs/tags/v2.0.0-dev' | awk '{print $1}')
-            echo "Update check: tag v2.0.0-dev -> $RESOLVED"
+          if [ "${{ steps.current.outputs.rev }}" = "${{ steps.upstream.outputs.rev }}" ]; then
+            echo "needed=false" >> $GITHUB_OUTPUT
+            echo "Already up to date at ${{ steps.current.outputs.rev }}"
+          else
+            echo "needed=true" >> $GITHUB_OUTPUT
+            echo "Update available: ${{ steps.current.outputs.rev }} -> ${{ steps.upstream.outputs.rev }}"
           fi
-          echo "needed=true" >> $GITHUB_OUTPUT
 
       - name: Update hash
         if: steps.check.outputs.needed == 'true'
         run: |
-          # Prefetch and get the new hash
-          NEW_HASH=$(nix-prefetch-git --url https://github.com/PancakeTAS/lsfg-vk --rev v2.0.0-dev --quiet 2>/dev/null | jq -r '.sha256')
-          SRI_HASH=$(nix-hash --to-sri --type sha256 "$NEW_HASH")
+          # Use nix-prefetch-url with --unpack to get the fetchFromGitHub hash
+          URL="https://github.com/PancakeTAS/lsfg-vk/archive/v2.0.0-dev.tar.gz"
+          HASH=$(nix store prefetch-file --unpack --json "$URL" | jq -r '.hash')
 
-          # Update package.nix
-          sed -i "s|hash = \"sha256-[^\"]*\"|hash = \"$SRI_HASH\"|" package.nix
+          # Update package.nix with new hash and rev
+          sed -i "s|hash = \"sha256-[^\"]*\"|hash = \"$HASH\"|" package.nix
+          sed -i "s|rev = \"[^\"]*\"|rev = \"${{ steps.upstream.outputs.rev }}\"|" package.nix
 
-          echo "Updated hash to: $SRI_HASH"
+          echo "Updated hash to: $HASH"
+          echo "Updated rev to: ${{ steps.upstream.outputs.rev }}"
 
       - name: Test build
         if: steps.check.outputs.needed == 'true'
@@ -54,10 +63,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add package.nix flake.lock
+          git add package.nix
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Update lsfg-vk hash (automated)"
+            SHORT_REV=$(echo "${{ steps.upstream.outputs.rev }}" | cut -c1-7)
+            git commit -m "chore: update lsfg-vk to ${SHORT_REV} (automated)"
             git push
           fi
