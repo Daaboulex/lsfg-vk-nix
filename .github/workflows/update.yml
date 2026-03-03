@@ -1,0 +1,63 @@
+name: Update lsfg-vk
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Get latest upstream commit
+        id: upstream
+        run: |
+          LATEST_REV=$(git ls-remote --tags https://github.com/PancakeTAS/lsfg-vk.git 'refs/tags/v2.0.0-dev' | awk '{print $1}')
+          echo "rev=$LATEST_REV" >> $GITHUB_OUTPUT
+
+          CURRENT_REV=$(grep -oP "rev = \"[^\"]+\"" package.nix | sed 's/rev = "//;s/"//')
+          echo "current=$CURRENT_REV" >> $GITHUB_OUTPUT
+
+      - name: Check if update needed
+        id: check
+        run: |
+          if [ "${{ steps.upstream.outputs.rev }}" = "v2.0.0-dev" ]; then
+            # Tag-based, need to resolve to commit
+            RESOLVED=$(git ls-remote https://github.com/PancakeTAS/lsfg-vk.git 'refs/tags/v2.0.0-dev' | awk '{print $1}')
+            echo "Update check: tag v2.0.0-dev -> $RESOLVED"
+          fi
+          echo "needed=true" >> $GITHUB_OUTPUT
+
+      - name: Update hash
+        if: steps.check.outputs.needed == 'true'
+        run: |
+          # Prefetch and get the new hash
+          NEW_HASH=$(nix-prefetch-git --url https://github.com/PancakeTAS/lsfg-vk --rev v2.0.0-dev --quiet 2>/dev/null | jq -r '.sha256')
+          SRI_HASH=$(nix-hash --to-sri --type sha256 "$NEW_HASH")
+
+          # Update package.nix
+          sed -i "s|hash = \"sha256-[^\"]*\"|hash = \"$SRI_HASH\"|" package.nix
+
+          echo "Updated hash to: $SRI_HASH"
+
+      - name: Test build
+        if: steps.check.outputs.needed == 'true'
+        run: nix build .
+
+      - name: Commit and push
+        if: steps.check.outputs.needed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.nix flake.lock
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update lsfg-vk hash (automated)"
+            git push
+          fi
