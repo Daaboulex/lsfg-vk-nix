@@ -4,6 +4,7 @@
   fetchFromGitHub,
   cmake,
   pkg-config,
+  makeWrapper,
   vulkan-headers,
   vulkan-loader,
   qt6,
@@ -23,6 +24,7 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [
     cmake
     pkg-config
+    makeWrapper
     qt6.wrapQtAppsHook
   ];
 
@@ -41,15 +43,18 @@ stdenv.mkDerivation rec {
     "-DLSFGVK_LAYER_LIBRARY_PATH=${placeholder "out"}/lib/liblsfg-vk-layer.so"
   ];
 
-  # The Vulkan layer JSON needs to find the .so in the Nix store
-  postInstall = ''
-    # Verify the layer JSON has the correct path
-    if [ -f "$out/share/vulkan/implicit_layer.d/VkLayer_LSFGVK_frame_generation.json" ]; then
-      echo "Vulkan layer JSON installed successfully"
-      cat "$out/share/vulkan/implicit_layer.d/VkLayer_LSFGVK_frame_generation.json"
-    else
-      echo "WARNING: Vulkan layer JSON not found!"
-    fi
+  # Prevent wrapQtAppsHook from auto-wrapping all binaries —
+  # the CLI doesn't use Qt and shouldn't get Qt env vars
+  dontWrapQtApps = true;
+
+  postFixup = ''
+    # Wrap UI with Qt environment + Vulkan loader
+    wrapQtApp $out/bin/lsfg-vk-ui \
+      --prefix LD_LIBRARY_PATH : "${vulkan-loader}/lib"
+
+    # Wrap CLI with just Vulkan loader (no Qt needed)
+    wrapProgram $out/bin/lsfg-vk-cli \
+      --prefix LD_LIBRARY_PATH : "${vulkan-loader}/lib"
   '';
 
   meta = with lib; {
