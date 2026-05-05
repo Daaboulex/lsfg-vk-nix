@@ -1,0 +1,18 @@
+{
+  "package": "lsfg-vk",
+  "upstream": {
+    "type": "github-commit",
+    "owner": "Starter-Pack-Gaming",
+    "repo": "lsfg-vk",
+    "branch": "v2.0.0-dev"
+  },
+  "packageFile": "package.nix",
+  "hashes": [
+    "hash"
+  ],
+  "verify": {
+    "binary": null,
+    "args": null,
+    "check": "elf"
+  }
+}
