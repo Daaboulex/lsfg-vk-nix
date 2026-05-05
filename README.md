@@ -1,23 +1,21 @@
 # lsfg-vk-nix
 
-[![CI](https://github.com/Daaboulex/lsfg-vk-nix/actions/workflows/ci.yml/badge.svg)](https://github.com/Daaboulex/lsfg-vk-nix/actions/workflows/ci.yml)
-[![License](https://img.shields.io/github/license/Daaboulex/lsfg-vk-nix)](./LICENSE)
-[![NixOS](https://img.shields.io/badge/NixOS-unstable-78C0E8?logo=nixos&logoColor=white)](https://nixos.org)
-[![Last commit](https://img.shields.io/github/last-commit/Daaboulex/lsfg-vk-nix)](https://github.com/Daaboulex/lsfg-vk-nix/commits)
-[![Stars](https://img.shields.io/github/stars/Daaboulex/lsfg-vk-nix?style=flat)](https://github.com/Daaboulex/lsfg-vk-nix/stargazers)
-[![Issues](https://img.shields.io/github/issues/Daaboulex/lsfg-vk-nix)](https://github.com/Daaboulex/lsfg-vk-nix/issues)
+<!-- BEGIN generated:badges -->
+[![NixOS unstable](https://img.shields.io/badge/NixOS-unstable-78C0E8?logo=nixos&logoColor=white)](https://nixos.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+<!-- END generated:badges -->
 
 Nix package for [lsfg-vk](https://github.com/PancakeTAS/lsfg-vk) by [PancakeTAS](https://github.com/PancakeTAS) — Vulkan frame generation using [Lossless Scaling](https://store.steampowered.com/app/993090/Lossless_Scaling/) on Linux.
 
+<!-- BEGIN generated:upstream -->
 ## Upstream
 
-This is a **Nix packaging wrapper** — not the original project. All credit for lsfg-vk goes to:
-
-- **Author**: [PancakeTAS](https://github.com/PancakeTAS) and the upstream contributors
-- **Repository**: [github.com/PancakeTAS/lsfg-vk](https://github.com/PancakeTAS/lsfg-vk)
-- **License**: [GPL-3.0](https://github.com/PancakeTAS/lsfg-vk/blob/develop/LICENSE.md)
-
-Tracked branch: `Starter-Pack-Gaming/lsfg-vk` v2.0.0-dev (active downstream).
+| | |
+|---|---|
+| **Project** | [Starter-Pack-Gaming/lsfg-vk](https://github.com/Starter-Pack-Gaming/lsfg-vk) |
+| **License** | GPL-3.0 |
+| **Tracked** | Git commits (v2.0.0-dev) |
+<!-- END generated:upstream -->
 
 ## What Is This?
 
@@ -40,6 +38,27 @@ A Nix flake that builds the lsfg-vk Vulkan layer + UI + CLI from upstream with f
 
 - **[Lossless Scaling](https://store.steampowered.com/app/993090/Lossless_Scaling/)** installed via Steam
 - Vulkan-capable GPU (AMD RADV, NVIDIA, Intel)
+
+<!-- BEGIN generated:installation -->
+## Installation
+
+Add as a flake input:
+
+```nix
+{
+  inputs.lsfg-vk = {
+    url = "github:Daaboulex/lsfg-vk-nix";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+}
+```
+
+Then add the overlay:
+
+```nix
+nixpkgs.overlays = [ inputs.lsfg-vk.overlays.default ];
+```
+<!-- END generated:installation -->
 
 ## Usage
 
@@ -108,3 +127,9 @@ This package tracks the upstream `v2.0.0-dev` tag from [PancakeTAS/lsfg-vk](http
 
 - **Nix packaging (this repo)**: [MIT](LICENSE)
 - **lsfg-vk (upstream)**: [GPL-3.0](https://github.com/PancakeTAS/lsfg-vk/blob/develop/LICENSE.md)
+
+<!-- BEGIN generated:footer -->
+---
+
+*Maintained as part of the [Daaboulex](https://github.com/Daaboulex) NixOS ecosystem.*
+<!-- END generated:footer -->
