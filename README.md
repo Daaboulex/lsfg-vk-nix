@@ -117,6 +117,15 @@ DISABLE_LSFGVK=1 your-application
 
 This package tracks the upstream `v2.0.0-dev` tag from [PancakeTAS/lsfg-vk](https://github.com/PancakeTAS/lsfg-vk). A GitHub Actions workflow automatically checks for new releases and updates the package hash.
 
+## Development
+
+```bash
+nix develop                  # dev shell with pre-commit hooks
+nix flake check --no-build   # eval check (fast)
+nix build                    # build package
+nix fmt                      # format with treefmt
+```
+
 ## Credits
 
 - **[PancakeTAS](https://github.com/PancakeTAS)** — Creator and maintainer of lsfg-vk
