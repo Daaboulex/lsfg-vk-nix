@@ -2,9 +2,9 @@
   "package": "lsfg-vk",
   "upstream": {
     "type": "github-commit",
-    "owner": "Starter-Pack-Gaming",
+    "owner": "PancakeTAS",
     "repo": "lsfg-vk",
-    "branch": "v2.0.0-dev"
+    "branch": "develop"
   },
   "packageFile": "package.nix",
   "hashes": [
