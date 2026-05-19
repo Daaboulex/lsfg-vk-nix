@@ -12,7 +12,7 @@
 
 stdenv.mkDerivation rec {
   pname = "lsfg-vk";
-  version = "218820e";
+  version = "1.0.0-unstable-2026-04-25";
 
   src = fetchFromGitHub {
     owner = "PancakeTAS";
