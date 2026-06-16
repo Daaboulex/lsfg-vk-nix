@@ -16,5 +16,17 @@
     "binary": null,
     "args": null,
     "check": "elf"
-  }
+  },
+  "description": "lsfg-vk packaged for NixOS - Vulkan frame-generation layer + Qt6 UI/CLI via Lossless Scaling",
+  "topics": [
+    "nix",
+    "nixos",
+    "flake",
+    "lsfg-vk",
+    "vulkan",
+    "frame-generation",
+    "lossless-scaling",
+    "gaming",
+    "proton"
+  ]
 }
