@@ -71,7 +71,7 @@ stdenv.mkDerivation rec {
     '';
     homepage = "https://github.com/PancakeTAS/lsfg-vk";
     license = licenses.gpl3Only;
-    platforms = [ "x86_64-linux" ];
+    platforms = lib.platforms.linux;
     mainProgram = "lsfg-vk-ui";
     maintainers = [ "Daaboulex" ];
   };
