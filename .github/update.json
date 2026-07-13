@@ -8,7 +8,7 @@
   },
   "packageFile": "package.nix",
   "versionScheme": "unstable-date",
-  "versionBase": "1.0.0",
+  "versionBase": "2.0.0-dev",
   "hashes": [
     "hash"
   ],
