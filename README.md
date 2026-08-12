@@ -141,7 +141,4 @@ nix fmt                      # format (nixfmt-rfc-style)
 - **lsfg-vk (upstream)**: [GPL-3.0](https://github.com/PancakeTAS/lsfg-vk/blob/develop/LICENSE.md)
 
 <!-- BEGIN generated:footer -->
----
-
-*Maintained as part of the [Daaboulex](https://github.com/Daaboulex) NixOS ecosystem.*
 <!-- END generated:footer -->
