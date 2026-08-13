@@ -41,10 +41,12 @@
           apps.lsfg-vk-ui = {
             type = "app";
             program = "${self'.packages.lsfg-vk}/bin/lsfg-vk-ui";
+            meta.description = "Configuration UI for the lsfg-vk Lossless Scaling frame-generation Vulkan layer";
           };
           apps.lsfg-vk-cli = {
             type = "app";
             program = "${self'.packages.lsfg-vk}/bin/lsfg-vk-cli";
+            meta.description = "Command-line configurator for the lsfg-vk Lossless Scaling frame-generation Vulkan layer";
           };
           apps.default = self'.apps.lsfg-vk-ui;
         };
