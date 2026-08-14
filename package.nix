@@ -73,6 +73,12 @@ stdenv.mkDerivation rec {
     license = licenses.gpl3Only;
     platforms = lib.platforms.linux;
     mainProgram = "lsfg-vk-ui";
-    maintainers = [ "Daaboulex" ];
+    maintainers = [
+      {
+        name = "Daaboulex";
+        github = "Daaboulex";
+        githubId = 39669593;
+      }
+    ];
   };
 }
