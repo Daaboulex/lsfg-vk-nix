@@ -12,13 +12,13 @@
 
 stdenv.mkDerivation rec {
   pname = "lsfg-vk";
-  version = "2.0.0-dev-unstable-2026-06-28";
+  version = "2.0.0-dev-unstable-2026-08-28";
 
   src = fetchFromGitHub {
     owner = "PancakeTAS";
     repo = "lsfg-vk";
-    rev = "8b0da2661c6f3473a7fccc8ba643880050e71642";
-    hash = "sha256-SDZXT+eYkOPr/qqZgCip9YSSf6SWwuvv1Y20+hlqGCw=";
+    rev = "0213be9ff93121283ad46a27119f40ece0e6f301";
+    hash = "sha256-1HfVRaExIhtD+yRgu0y1x02VVIT/lW1xm1oL7bxwoMA=";
   };
 
   nativeBuildInputs = [
