@@ -1,14 +1,13 @@
 {
   "package": "lsfg-vk",
   "upstream": {
-    "type": "github-commit",
-    "owner": "PancakeTAS",
-    "repo": "lsfg-vk",
-    "branch": "develop"
+    "type": "git-ls-remote",
+    "url": "https://git.lsfg-vk.dev/lsfg-vk.git",
+    "branch": "master"
   },
   "packageFile": "package.nix",
   "versionScheme": "unstable-date",
-  "versionBase": "2.0.0-dev",
+  "versionBase": "2.0.0-rc1",
   "hashes": [
     "hash"
   ],

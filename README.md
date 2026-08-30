@@ -6,16 +6,16 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 <!-- END generated:badges -->
 
-Nix package for [lsfg-vk](https://github.com/PancakeTAS/lsfg-vk) by [PancakeTAS](https://github.com/PancakeTAS) — Vulkan frame generation using [Lossless Scaling](https://store.steampowered.com/app/993090/Lossless_Scaling/) on Linux.
+Nix package for [lsfg-vk](https://lsfg-vk.dev) by [PancakeTAS](https://lsfg-vk.dev) — Vulkan frame generation using [Lossless Scaling](https://store.steampowered.com/app/993090/Lossless_Scaling/) on Linux.
 
 <!-- BEGIN generated:upstream -->
 ## Upstream
 
 | | |
 |---|---|
-| **Project** | [PancakeTAS/lsfg-vk](https://github.com/PancakeTAS/lsfg-vk) |
-| **License** | GPL-3.0 |
-| **Tracked** | Git commits (develop branch) |
+| **Project** | [lsfg-vk.dev](https://lsfg-vk.dev) (git: [git.lsfg-vk.dev](https://git.lsfg-vk.dev/lsfg-vk)) |
+| **License** | CC BY-NC-ND 4.0 (unfree: needs `allowUnfree`) |
+| **Tracked** | Git commits (`master` branch, via `git ls-remote`) |
 
 <!-- END generated:upstream -->
 
@@ -40,6 +40,24 @@ A Nix flake that builds the lsfg-vk Vulkan layer + UI + CLI from upstream with f
 
 - **[Lossless Scaling](https://store.steampowered.com/app/993090/Lossless_Scaling/)** installed via Steam
 - Vulkan-capable GPU (AMD RADV, NVIDIA, Intel)
+- **`allowUnfree` for this package.** Upstream relicensed to CC BY-NC-ND 4.0 on
+  2026-08-27, which nixpkgs classifies as unfree, so the build is refused without it.
+  This is about freedom, not price: the licence is gratis and anyone may download and
+  use lsfg-vk, but NonCommercial and NoDerivatives fail the FSF criteria.
+
+  Allow it globally:
+
+  ```nix
+  nixpkgs.config.allowUnfree = true;
+  ```
+
+  Or allow only this package:
+
+  ```nix
+  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "lsfg-vk" ];
+  ```
+
+  For a one-off command, `NIXPKGS_ALLOW_UNFREE=1 nix build --impure`.
 
 <!-- BEGIN generated:installation -->
 ## Installation
@@ -118,7 +136,16 @@ DISABLE_LSFGVK=1 your-application
 
 ## Updates
 
-This package tracks the `develop` branch of [PancakeTAS/lsfg-vk](https://github.com/PancakeTAS/lsfg-vk). A daily GitHub Actions workflow detects new commits, recomputes the hash, rebuilds, and commits to `main` on success (or opens an issue on failure).
+This package tracks the `master` branch of the upstream git repository at
+`https://git.lsfg-vk.dev/lsfg-vk.git`. A daily GitHub Actions workflow detects new
+commits via `git ls-remote`, recomputes the hash, rebuilds, and commits to `main` on
+success (or opens an issue on failure).
+
+Upstream left GitHub on 2026-08-27: the `PancakeTAS/lsfg-vk` repository was emptied
+and is frozen at a migration notice, so the old `github-commit` updater would have
+reported success forever without ever finding an update. The advertised Codeberg
+mirror is not syncing (still at its initial commit), so the self-hosted remote is
+currently the only live source.
 
 ## Development
 
@@ -131,14 +158,19 @@ nix fmt                      # format (nixfmt-rfc-style)
 
 ## Credits
 
-- **[PancakeTAS](https://github.com/PancakeTAS)** — Creator and maintainer of lsfg-vk
+- **[PancakeTAS](https://lsfg-vk.dev)** — Creator and maintainer of lsfg-vk
 - **[Lossless Scaling](https://store.steampowered.com/app/993090/Lossless_Scaling/)** by [TechPowerUp](https://www.techpowerup.com/)
-- All upstream [contributors](https://github.com/PancakeTAS/lsfg-vk/graphs/contributors)
+- All upstream contributors
 
 ## License
 
 - **Nix packaging (this repo)**: [MIT](LICENSE)
-- **lsfg-vk (upstream)**: [GPL-3.0](https://github.com/PancakeTAS/lsfg-vk/blob/develop/LICENSE.md)
+- **lsfg-vk (upstream)**: [CC BY-NC-ND 4.0](https://git.lsfg-vk.dev/lsfg-vk/plain/LICENSE.txt)
+  (relicensed from GPL-3.0 on 2026-08-27). NonCommercial and NoDerivatives both fail
+  the FSF criteria, so nixpkgs marks this unfree. NoDerivatives also means this
+  package must never patch upstream source: a patched build is a derivative work.
+  It builds with clang because gcc 15 rejects `hooks.cpp`, and changing the
+  toolchain is permitted where changing their source is not.
 
 <!-- BEGIN generated:footer -->
 <!-- END generated:footer -->

@@ -1,7 +1,7 @@
 {
   lib,
-  stdenv,
-  fetchFromGitHub,
+  clangStdenv,
+  fetchgit,
   cmake,
   pkg-config,
   makeWrapper,
@@ -10,15 +10,24 @@
   qt6,
 }:
 
-stdenv.mkDerivation rec {
+# Built with clang, not the default gcc. Upstream builds with clang (its
+# cmake/Diagnostics.cmake only wires clang-tidy for Clang), and gcc 15 rejects
+# hooks.cpp's brace-init of vk::Extent2D as ambiguous against three operator=
+# candidates in their VENDORED thirdparty/vulkan/vulkan.hpp. Switching our
+# toolchain is the only fix available: the CC BY-NC-ND licence forbids
+# derivative works, so patching their source is not permitted.
+clangStdenv.mkDerivation rec {
   pname = "lsfg-vk";
-  version = "2.0.0-dev-unstable-2026-08-28";
+  version = "2.0.0-rc1-unstable-2026-08-29";
 
-  src = fetchFromGitHub {
-    owner = "PancakeTAS";
-    repo = "lsfg-vk";
-    rev = "0213be9ff93121283ad46a27119f40ece0e6f301";
-    hash = "sha256-1HfVRaExIhtD+yRgu0y1x02VVIT/lW1xm1oL7bxwoMA=";
+  # Upstream left GitHub on 2026-08-27; the GitHub repo is frozen at a migration
+  # notice and its source was removed. The advertised Codeberg mirror is not
+  # syncing (still at its initial commit), so this self-hosted remote is the only
+  # live source. The cgit web path is NOT cloneable; the .git suffix is.
+  src = fetchgit {
+    url = "https://git.lsfg-vk.dev/lsfg-vk.git";
+    rev = "9d10aae00bcc3fa3ed0f86d602b67c35011d47a2";
+    hash = "sha256-K0eFiEJo5qMFwMzVFqV0e3c+ktPWO3o89R/bIz37PFg=";
   };
 
   nativeBuildInputs = [
@@ -35,11 +44,14 @@ stdenv.mkDerivation rec {
     qt6.qtdeclarative
   ];
 
+  # v2 renamed LSFGVK_BUILD_VK_LAYER and dropped LSFGVK_INSTALL_XDG_FILES; the
+  # old names would be accepted silently as unused cache entries and build the
+  # wrong thing. LSFGVK_MANAGED is upstream's own flag for distro packaging.
   cmakeFlags = [
-    "-DLSFGVK_BUILD_VK_LAYER=ON"
+    "-DLSFGVK_BUILD_LAYER=ON"
     "-DLSFGVK_BUILD_UI=ON"
     "-DLSFGVK_BUILD_CLI=ON"
-    "-DLSFGVK_INSTALL_XDG_FILES=ON"
+    "-DLSFGVK_MANAGED=ON"
     "-DLSFGVK_LAYER_LIBRARY_PATH=${placeholder "out"}/lib/liblsfg-vk-layer.so"
   ];
 
@@ -69,8 +81,12 @@ stdenv.mkDerivation rec {
       - lsfg-vk-ui: Qt6/QML graphical configuration interface with per-game profiles
       - lsfg-vk-cli: Command-line tool for benchmarking and config validation
     '';
-    homepage = "https://github.com/PancakeTAS/lsfg-vk";
-    license = licenses.gpl3Only;
+    homepage = "https://lsfg-vk.dev";
+    # Relicensed from GPLv3 on 2026-08-27. CC BY-NC-ND is not a free licence:
+    # NonCommercial and NoDerivatives both fail the FSF criteria, so nixpkgs
+    # marks it unfree and it needs allowUnfree. NoDerivatives is also why this
+    # derivation must never patch the source -- a patched build is a derivative.
+    license = licenses.cc-by-nc-nd-40;
     platforms = lib.platforms.linux;
     mainProgram = "lsfg-vk-ui";
     maintainers = [
