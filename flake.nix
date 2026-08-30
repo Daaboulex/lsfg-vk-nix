@@ -26,7 +26,16 @@
       imports = [ inputs.std.flakeModules.base ];
 
       perSystem =
-        { pkgs, self', ... }:
+        { system, self', ... }:
+        let
+          # lsfg-vk is unfree since upstream relicensed to CC BY-NC-ND on
+          # 2026-08-27, so the default nixpkgs instance refuses to evaluate it and
+          # every build here (CI included) fails before it starts.
+          pkgs = import inputs.nixpkgs {
+            inherit system;
+            config.allowUnfree = true;
+          };
+        in
         {
           # "nd" is a real word to typos ("and"), but it is load-bearing here: the
           # nixpkgs licence attribute is literally licenses.cc-by-nc-nd-40 and the
