@@ -18,7 +18,7 @@
 # derivative works, so patching their source is not permitted.
 clangStdenv.mkDerivation rec {
   pname = "lsfg-vk";
-  version = "2.0.0-unstable-2026-10-12";
+  version = "2.0.0-unstable-2026-10-19";
 
   # Upstream left GitHub on 2026-08-27; the GitHub repo is frozen at a migration
   # notice and its source was removed. The advertised Codeberg mirror is not
@@ -26,8 +26,8 @@ clangStdenv.mkDerivation rec {
   # live source. The cgit web path is NOT cloneable; the .git suffix is.
   src = fetchgit {
     url = "https://git.lsfg-vk.dev/lsfg-vk.git";
-    rev = "eb080c933da9612d70ed12d15610f808b76f108b";
-    hash = "sha256-pzRfJZ7/n2dGnCRlse31kWfSrtj0HexRhl70/PdrKGI=";
+    rev = "21fbd1bc4e94ebc076cc0a86f09e3107b83f0c96";
+    hash = "sha256-YwCvbxdRhPz2daEIEMOciA/i4nhk/hY0Tj7l9t9oOWI=";
   };
 
   nativeBuildInputs = [
