@@ -1,62 +1,39 @@
-# lsfg-vk-nix
+# lsfg-vk (Nix)
 
-<!-- BEGIN generated:badges -->
-[![CI](https://github.com/Daaboulex/lsfg-vk-nix/actions/workflows/ci.yml/badge.svg)](https://github.com/Daaboulex/lsfg-vk-nix/actions/workflows/ci.yml)
-[![NixOS unstable](https://img.shields.io/badge/NixOS-unstable-78C0E8?logo=nixos&logoColor=white)](https://nixos.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
-<!-- END generated:badges -->
+A Nix package of [lsfg-vk](https://lsfg-vk.dev), created and maintained by
+[PancakeTAS](https://lsfg-vk.dev) with its upstream contributors. It generates
+extra frames in Vulkan games on Linux with the frame generation of
+[Lossless Scaling](https://store.steampowered.com/app/993090/Lossless_Scaling/)
+by THS. It is for people who own Lossless Scaling on Steam, and it covers
+native Linux games and Windows games run through Wine or Proton.
 
-Nix package for [lsfg-vk](https://lsfg-vk.dev) by [PancakeTAS](https://lsfg-vk.dev) — Vulkan frame generation using [Lossless Scaling](https://store.steampowered.com/app/993090/Lossless_Scaling/) on Linux.
+The flake is set up for `x86_64-linux` and `aarch64-linux`, on nixos-unstable.
+Its checks build the package and confirm that `lsfg-vk-ui` is in the result.
+Nothing in this repository runs the layer in a game, so no GPU, game or machine
+is recorded here as tried.
 
-<!-- BEGIN generated:upstream -->
-## Upstream
+## What you get
 
-| | |
-|---|---|
-| **Project** | [lsfg-vk.dev](https://lsfg-vk.dev) (git: [git.lsfg-vk.dev](https://git.lsfg-vk.dev/lsfg-vk)) |
-| **License** | CC BY-NC-ND 4.0 (unfree: the overlay's package needs `allowUnfree`) |
-| **Tracked** | Git commits (`master` branch, via `git ls-remote`) |
+One package, `lsfg-vk`, built from upstream source, with three parts:
 
-<!-- END generated:upstream -->
+- The Vulkan layer. It is an implicit layer, so it loads for any Vulkan game.
+  You enable it per game, in the UI or through environment variables.
+- `lsfg-vk-ui`, a graphical configuration program with per-game profiles.
+- `lsfg-vk-cli`, a command-line tool for benchmarking and for validating the
+  configuration.
 
-## What Is This?
+Lossless Scaling itself is not in this flake and is not redistributed by it.
+lsfg-vk reads the Lossless Scaling DLL from your Steam install at runtime.
 
-A Nix flake that builds the lsfg-vk Vulkan layer, UI and CLI from upstream source:
+## What you need
 
-- **Implicit Vulkan layer** — auto-loads for any Vulkan game; per-game enable through environment variables or the GUI
-- **Lossless Scaling integration** — pulls the Lossless Scaling DLL from the user's Steam install at runtime; this flake does NOT redistribute Lossless Scaling
+- [Lossless Scaling](https://store.steampowered.com/app/993090/Lossless_Scaling/),
+  installed through Steam.
+- A Vulkan-capable GPU (AMD RADV, NVIDIA, Intel).
 
-## What's Included
+## Install
 
-The package holds the implicit Vulkan layer, `lsfg-vk-ui` and `lsfg-vk-cli`, each described in the `longDescription` of [package.nix](./package.nix).
-
-## Requirements
-
-- **[Lossless Scaling](https://store.steampowered.com/app/993090/Lossless_Scaling/)** installed via Steam
-- Vulkan-capable GPU (AMD RADV, NVIDIA, Intel)
-- **`allowUnfree` for `pkgs.lsfg-vk` from the overlay.** lsfg-vk is under
-  CC BY-NC-ND 4.0, which nixpkgs classifies as unfree, so the overlay's package is
-  refused unless your nixpkgs allows it. The flake's own packages (`nix build`,
-  `nix run`) already allow it and need nothing.
-  This is about freedom, not price: the licence is gratis and anyone may download and
-  use lsfg-vk, but NonCommercial and NoDerivatives fail the FSF criteria.
-
-  Allow it globally:
-
-  ```nix
-  nixpkgs.config.allowUnfree = true;
-  ```
-
-  Or allow only this package:
-
-  ```nix
-  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "lsfg-vk" ];
-  ```
-
-<!-- BEGIN generated:installation -->
-## Installation
-
-Add as a flake input:
+Add the flake:
 
 ```nix
 {
@@ -67,102 +44,92 @@ Add as a flake input:
 }
 ```
 
-Then add the overlay:
-
-```nix
-nixpkgs.overlays = [ inputs.lsfg-vk.overlays.default ];
-```
-
-<!-- END generated:installation -->
-
-## Usage
-
-### As a Flake Input
+Then add the overlay, allow the package and install it:
 
 ```nix
 {
-  inputs.lsfg-vk = {
-    url = "github:daaboulex/lsfg-vk-nix";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
+  nixpkgs.overlays = [ inputs.lsfg-vk.overlays.default ];
+  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "lsfg-vk" ];
+  environment.systemPackages = [ pkgs.lsfg-vk ];
 }
 ```
 
-Add the overlay to your system configuration:
+lsfg-vk is unfree, so nixpkgs refuses `pkgs.lsfg-vk` from the overlay until you
+allow it. The second line allows only this package.
+`nixpkgs.config.allowUnfree = true;` allows every unfree package instead.
 
-```nix
-nixpkgs.overlays = [ inputs.lsfg-vk.overlays.default ];
-```
+Unfree is about freedom, not price. The licence is gratis and anyone may
+download and use lsfg-vk.
 
-Then add to your packages:
-
-```nix
-environment.systemPackages = [ pkgs.lsfg-vk ];
-```
-
-### Quick Test (without installing)
+To try it without installing:
 
 ```bash
-nix run github:daaboulex/lsfg-vk-nix        # Launch the UI
-nix run github:daaboulex/lsfg-vk-nix#lsfg-vk-cli  # Launch the CLI
+nix run github:Daaboulex/lsfg-vk-nix
+nix run github:Daaboulex/lsfg-vk-nix#lsfg-vk-cli
 ```
 
-## Configuration
+The first starts the UI, the second the CLI. Neither needs the unfree setting,
+because the flake's own packages already allow it.
 
-After installation, launch `lsfg-vk-ui` from your application menu or terminal:
+## Use
+
+Start `lsfg-vk-ui` from your application menu or a terminal:
 
 ```bash
 lsfg-vk-ui
 ```
 
-- Configure per-game profiles in the **Profile Settings** section.
-- Set the Lossless Scaling install path in **Global Settings** (auto-detected for Steam).
-- Run benchmarks with `lsfg-vk-cli benchmark`.
-- Validate your config with `lsfg-vk-cli validate`.
+| Section in the UI | What you set there |
+|---|---|
+| Profile Settings | The per-game profiles |
+| Global Settings | The Lossless Scaling install path, auto-detected for Steam |
 
-The Vulkan layer activates automatically for any game matching a configured profile.
+The layer then activates on its own for any game that matches a profile.
 
-To disable the layer for a specific application:
+The CLI has two commands to start with:
+
+```bash
+lsfg-vk-cli benchmark
+lsfg-vk-cli validate
+```
+
+The first runs a benchmark. The second validates your configuration.
+
+## Known limits
+
+- You need your own copy of Lossless Scaling on Steam. This flake does not
+  ship it.
+- This package never patches lsfg-vk. A fix to its source has to come from
+  upstream.
+
+## When something does not work
+
+Check the configuration first:
+
+```bash
+lsfg-vk-cli validate
+```
+
+To run one program without the layer:
 
 ```bash
 DISABLE_LSFGVK=1 your-application
 ```
 
-## Updates
+## More
 
-This package tracks the `master` branch of the upstream git repository at
-`https://git.lsfg-vk.dev/lsfg-vk.git`. A daily GitHub Actions workflow detects new
-commits via `git ls-remote`, recomputes the hash, rebuilds, and commits to `main` on
-success (or opens an issue on failure).
-
-The self-hosted remote at `git.lsfg-vk.dev` is the live source, and the
-`no-derivative-works` check fails if [package.nix](./package.nix) fetches from
-anywhere else.
-
-## Development
-
-```bash
-nix develop                  # dev shell with pre-commit hooks
-nix flake check --no-build   # eval check (fast)
-nix build                    # build package
-nix fmt                      # format (nixfmt-rfc-style)
-```
-
-## Credits
-
-- **[PancakeTAS](https://lsfg-vk.dev)** — Creator and maintainer of lsfg-vk
-- **[Lossless Scaling](https://store.steampowered.com/app/993090/Lossless_Scaling/)** by THS
-- All upstream contributors
+- [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md): building, the checks, how the
+  pinned upstream commit is updated
+- [SECURITY.md](SECURITY.md): how to report a vulnerability
 
 ## License
 
-- **Nix packaging (this repo)**: [MIT](LICENSE)
-- **lsfg-vk (upstream)**: [CC BY-NC-ND 4.0](https://git.lsfg-vk.dev/lsfg-vk/plain/LICENSE.txt).
-  NonCommercial and NoDerivatives both fail
-  the FSF criteria, so nixpkgs marks this unfree. NoDerivatives also means this
-  package must never patch upstream source: a patched build is a derivative work.
-  It builds with clang because gcc 15 rejects `hooks.cpp`, and changing the
-  toolchain is permitted where changing their source is not.
+The Nix packaging in this repository is [MIT](LICENSE).
 
-<!-- BEGIN generated:footer -->
-<!-- END generated:footer -->
+lsfg-vk (upstream) is
+[CC BY-NC-ND 4.0](https://git.lsfg-vk.dev/lsfg-vk/plain/LICENSE.txt).
+NonCommercial and NoDerivatives both fail the FSF criteria, so nixpkgs marks
+this unfree. NoDerivatives also means this package must never patch upstream
+source: a patched build is a derivative work. It builds with clang because
+gcc 15 rejects `hooks.cpp`, and changing the toolchain is permitted where
+changing their source is not.
